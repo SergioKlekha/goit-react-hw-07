@@ -1,25 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import s from './ContactList.module.css';
-import { useSelector } from 'react-redux';
-import { selectContacts } from '../../redux/contactsSlise';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectFilteredContacts,
+  selectLoading,
+} from '../../redux/contacts/contactsSlise';
 import Contact from '../Contact/Contact';
-import { selectFilter } from '../../redux/filtersSlice';
+import { fetchContactsThunk } from '../../redux/contactsOps';
 
 const ContactList = () => {
-  const contacts = useSelector(selectContacts);
-  const filter = useSelector(selectFilter);
-
-  const filteredData = contacts.filter((item) =>
-    item.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  const loading = useSelector(selectLoading);
+  const contacts = useSelector(selectFilteredContacts);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchContactsThunk());
+  }, [dispatch]);
 
   return (
     <ul className={s.contactsList}>
-      {filteredData.map((item) => (
-        <li key={item.id}>
-          <Contact item={item} />
-        </li>
-      ))}
+      {contacts.length ? (
+        contacts.map((item) => (
+          <li key={item.id}>
+            <Contact item={item} />
+          </li>
+        ))
+      ) : (
+        <h2>No contacts added</h2>
+      )}
+      {loading && <h2>Loading...</h2>}
     </ul>
   );
 };

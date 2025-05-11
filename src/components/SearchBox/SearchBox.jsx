@@ -1,31 +1,32 @@
 import React from 'react';
 import s from './SearchBox.module.css';
+import { Field, Form, Formik } from 'formik';
 import { FiSearch } from 'react-icons/fi';
 import { useDispatch } from 'react-redux';
-import { changeFilter } from '../../redux/filtersSlice';
+import { changeFilter } from '../../redux/contacts/filtersSlice';
 
 const SearchBox = () => {
   const dispatch = useDispatch();
-
-  const handleChange = (e) => {
-    dispatch(changeFilter(e.target.value));
+  const initialValues = { filter: '' };
+  const onSubmit = (values, options) => {
+    dispatch(changeFilter(values.filter));
+    options.resetForm();
   };
-
   return (
     <div className={s.boxWraper}>
-      <form className={s.form} onSubmit={(e) => e.preventDefault()}>
-        <input
-          className={s.input}
-          type="text"
-          name="filter"
-          placeholder="Search for..."
-          onChange={handleChange}
-        />
-        <button type="submit" className={s.searchBtn}>
-          <FiSearch />
-          Search
-        </button>
-      </form>
+      <Formik initialValues={initialValues} onSubmit={onSubmit}>
+        <Form className={s.form}>
+          <Field
+            className={s.input}
+            name="filter"
+            placeholder="Search for..."
+          />
+          <button type="submit" className={s.searchBtn}>
+            <FiSearch />
+            Search
+          </button>
+        </Form>
+      </Formik>
     </div>
   );
 };
